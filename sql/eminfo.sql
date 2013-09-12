@@ -3,7 +3,7 @@
 --
 
 SET NAMES utf8;
-USE eminfo;
+-- USE eminfo;
 -- GRANT SELECT,INSERT,UPDATE ON eminfo.* to eminfo@127.0.0.1 IDENTIFIED BY 'eminfo';
 -- FLUSH PRIVILEGES;
 
