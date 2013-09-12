@@ -64,6 +64,19 @@ sub db_update {
 	return undef;
   }
 
+  my ($eminfo_id, $plugin); 
+  if ($table eq 'postlog') {
+	my $xml = XMLin($text);
+	$eminfo_id = $xml->{'eminfo_id'};
+	$plugin = $xml->{'eminfo_plugin_config'}->{'basic'}->{'name'};
+	### $xml
+	### $eminfo_id
+	### $plugin
+  } elsif ($table eq 'heartbeat') {
+	$text =~ m/eminfo_id\s*=\s*(\w+)\s+/i;
+	$eminfo_id = $1;
+  }
+
   if ($table eq 'postlog') {
   	$sql=$connect->prepare("select count(*) from $table where id='$eminfo_id' and plugin='$plugin';");
   } elsif ($table eq 'heartbeat') {

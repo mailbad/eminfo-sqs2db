@@ -61,19 +61,29 @@ my %db_connect = (
 
 my $heartbeat = sqs_get($get_heartbeat_request, %sqs_connect);
 my $postlog = sqs_get($get_postlog_request, %sqs_connect);
-$postlog =~ s/[\r\n]//g;
+if (!$heartbeat || !$postlog) {
+	print "sqs get error\n";
+	exit (1);
+} else {
+	$heartbeat =~ s/[\r\n]//g;
+	$postlog =~ s/[\r\n]//g;
+}
 ### $heartbeat
 ### $postlog
 
 
-if ($heartbeat eq 'HTTPSQS_GET_END' || $heartbeat eq 'HTTPSQS_AUTH_FAILED') {
+if ($heartbeat eq 'HTTPSQS_GET_END') {
 	print "queue: heartbeat got to the end\n";
+} elsif ($heartbeat eq 'HTTPSQS_AUTH_FAILED') {
+	print "queue: heartbeat auth failed\n";
 } else {
 	db_update('heartbeat', $heartbeat, %db_connect);
 }
 
-if ($postlog eq 'HTTPSQS_GET_END' || $postlog eq 'HTTPSQS_AUTH_FAILED') {
+if ($postlog eq 'HTTPSQS_GET_END') {
 	print "queue: postlog got to the end\n";
+} elsif ($postlog eq 'HTTPSQS_AUTH_FAILED') {
+	print "queue: postlog auth failed\n";
 } else {
 	db_update('postlog', $postlog, %db_connect);
 }

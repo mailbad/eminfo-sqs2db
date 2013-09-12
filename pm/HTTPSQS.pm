@@ -38,7 +38,7 @@ sub sqs_get {
 	#'SSL_ca_path'		=> '/etc/ssl/certs',
   );
   unless ($connect) {
-	print "$!:$SSL_ERROR\n";
+	# print "$!:$SSL_ERROR\n";
 	close $connect;
 	return undef;
   }
