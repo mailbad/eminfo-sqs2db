@@ -1,0 +1,56 @@
+#!/usr/bin/perl
+use warnings;
+use strict;
+use Getopt::Std;
+use DBI;
+
+my $usage = "Usage: dbsetup -h hostname -d database -u user -p password";
+
+sub usage {
+	print $usage,"\n",$_[0],"\n";
+	exit 1;
+}
+
+my $opts = {};
+getopts("u:p:h:d:", $opts) or usage "Bad options";
+
+my $database = $opts->{d} || usage "Need database";
+my $hostname = $opts->{h} || "localhost";
+my $username = $opts->{u} || usage "Need username";
+my $password = $opts->{p};
+usage "Need password" unless defined $password;	# Could be blank
+
+# Connect to database
+my $dbh = DBI->connect("DBI:mysql:database=$database;host=$hostname",
+		$username, $password,
+		{ RaiseError => 1 },
+		)
+		or die "Cannot connect to database";
+
+# Current database version
+my $thisversion="1.5.2";
+
+# Create version table if it doesn't exist
+eval { $dbh->do("SELECT * FROM nagios_dbversion LIMIT 1") };
+if ($@) {
+
+	my $file="mysql.sql";
+	if (-e $file){
+	    print "** Creating tables for version $thisversion",$/;
+	    print "     Using $file for installation...",$/;
+	    my $p = "-p$password" if $password;	# Not required if password is blank
+	    system("mysql -u $username $p -D$database -h$hostname < $file") == 0 or die "Installation from $file failed";
+	}
+	else{
+	    die "No installation script found!";
+	}
+
+	print "** Updating table nagios_dbversion",$/;
+	$dbh->do("INSERT nagios_dbversion SET name='ndoutils', version='$thisversion';");
+
+	print "Done!",$/;
+}
+else {
+    print "*** Database already installed",$/;
+    exit 0;
+};
