@@ -31,9 +31,8 @@ my $dbh = DBI->connect(
 ) or die "Cannot connect to database";
 
 # Create version table if it doesn't exist
-eval { $dbh->do("SELECT * FROM nagios_dbversion LIMIT 1") };
+eval { $dbh->do("SELECT * FROM dbversion WHERE version='$thisversion' AND name='eminfo-sqs2db' LIMIT 1") };
 if ($@) {
-
 	my $file="create.sql";
 	if (-e $file){
 	    print "** Creating tables on version $thisversion\n";
