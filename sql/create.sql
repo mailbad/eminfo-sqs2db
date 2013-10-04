@@ -10,7 +10,7 @@
 -- Table structure for table `dbversion`
 --
 CREATE TABLE IF NOT EXISTS `dbversion` (
-  `name` varchar(10) character NOT NULL default '',
+  `name` varchar(30) character NOT NULL default '',
   `version` varchar(10) character NOT NULL default ''
 ) ENGINE=MyISAM;
 
