@@ -1,6 +1,12 @@
 package CONFIG;
 # use Smart::Comments;
 
+our @ISA = qw(Exporter);
+our @EXPORT = qw/conf_read/;
+our @EXPORT_OK = qw/conf_read/;
+
+$CONFIG::VERSION = '1.0.0';
+
 $| = 1;
 
 # Read value by [section].key 

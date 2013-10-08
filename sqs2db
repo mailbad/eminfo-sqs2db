@@ -1,6 +1,79 @@
 #!/usr/bin/env perl
+use lib './pm';
 use warnings;
 use strict;
-use DBI;
-use IO::Socket;
 use Getopt::Std;
+use Smart::Comments;
+use CONFIG qw/conf_read/;
+use HTTPSQS qw/sqs_get/;
+use DB qw/db_update/;
+
+
+my $sqshost = conf_read('sqs','host');
+my $sqsport = conf_read('sqs','port');
+my $sqstmout = conf_read('sqs','tmout');
+my $sqspass = conf_read('sqs','pass');
+my $sqscharset = conf_read('sqs','charset');
+my $sqsqueue_postlog = conf_read('sqs','postlog');
+my $sqsqueue_heartbeat = conf_read('sqs','heartbeat');
+### $sqshost
+### $sqsport
+### $sqspass
+### $sqstmout
+### $sqscharset
+### $sqsqueue_postlog
+### $sqsqueue_heartbeat
+
+my $dbhost = conf_read('db','host');
+my $dbport = conf_read('db','port');
+my $database = conf_read('db','database');
+my $dbuser= conf_read('db','user');
+my $dbpass = conf_read('db','pass');
+my $dbcharset = conf_read('db','charset');
+### $dbhost
+### $dbport
+### $database
+### $dbuser
+### $dbpass
+### $dbcharset
+
+my %sqs_connect = (
+	'host'	=>	$sqshost,
+	'port'	=>	$sqsport,
+	'tmout'	=>	$sqstmout,
+);
+my $get_postlog_request = "/?charset=$sqscharset&name=$sqsqueue_postlog&auth=$sqspass&opt=get";
+my $get_heartbeat_request = "/?charset=$sqscharset&name=$sqsqueue_heartbeat&auth=$sqspass&opt=get";
+### %sqs_connect
+### $get_postlog_request
+### $get_heartbeat_request
+
+my %db_connect = (
+        'dbhost'  =>      $dbhost,
+        'dbport'  =>      $dbport,
+	'database' =>	  $database,
+	'dbuser'  =>	  $dbuser,
+	'dbpass'  => 	  $dbpass,
+	'dbcharset' =>	  $dbcharset,
+);
+### %db_connect
+
+
+my $heartbeat = sqs_get($get_heartbeat_request, %sqs_connect);
+my $postlog = sqs_get($get_postlog_request, %sqs_connect);
+$postlog =~ s/[\r\n]//g;
+### $heartbeat
+### $postlog
+
+
+if ($heartbeat eq 'HTTPSQS_GET_END' || $heartbeat eq 'HTTPSQS_AUTH_FAILED') {
+	print "queue: heartbeat got to the end\n";
+} else {
+	db_update('heartbeat', $heartbeat, %db_connect);
+}
+
+if ($postlog eq 'HTTPSQS_GET_END' || $postlog eq 'HTTPSQS_AUTH_FAILED') {
+	print "queue: postlog got to the end\n";
+} else {
+	db_update('postlog', $postlog, %db_connect);
+}

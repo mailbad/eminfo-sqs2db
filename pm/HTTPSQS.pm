@@ -2,13 +2,18 @@ package HTTPSQS;
 use IO::Socket::SSL qw(debug0);   # debug0 ~ debug30
 #use Smart::Comments;
 
-$| = 1;
+our @ISA = qw(Exporter);
+our @EXPORT = qw/sqs_get/;
+our @EXPORT_OK = qw/sqs_get/;
 
+$HTTPSQS::VERSION = '1.0.0';
+
+
+$| = 1;
 
 #my %config = ( host=>'127.0.0.1', port=>'1218' );
 #my $result = &sqs_get("/?charset=utf-8&name=eminfo_postdata&auth=123qaz&opt=get", %config);
 #print "$result\n";
-
 
 # Get message from httpsqs
 # Usage: 	&sqs_get( {request_string}  %{sqs_server_conf} )
@@ -28,6 +33,7 @@ sub sqs_get {
   my $connect = IO::Socket::SSL->new(
 	'PeerAddr'		=> $sqs_conf{'host'} || '127.0.0.1',
 	'PeerPort'		=> $sqs_conf{'port'} || 1218,
+	'Timeout'		=> $sqs_conf{'tmout'} || 10,
 	'SSL_verify_mode'	=> 'SSL_VERIFY_NONE',
 	#'SSL_ca_path'		=> '/etc/ssl/certs',
   );
