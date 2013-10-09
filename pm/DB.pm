@@ -1,7 +1,7 @@
 package DB;
 use DBI;
 use XML::Simple;
-use Smart::Comments;
+# use Smart::Comments;
 
 our @ISA = qw(Exporter);
 our @EXPORT = qw/db_update/;
@@ -12,9 +12,9 @@ $DB::VERSION = '1.0.0';
 
 $| = 1;
 
-my $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!-- eminfo postdata start --><eminfo_postdata><eminfo_id>752148030</eminfo_id><eminfo_gname>dev_bbklab.net</eminfo_gname><eminfo_jobid>sKR5Bmyr</eminfo_jobid><eminfo_jobts>1381128986</eminfo_jobts><eminfo_plugin_config><basic><name>test</name><enable>yes</enable><comment>Just a Test Plugin</comment><frequency>3min</frequency><exec_tmout>1min</exec_tmout><maxerr_times>1</maxerr_times><take_snapshot_type> crit warn unkn tmout </take_snapshot_type><mail_notify_type> crit warn unkn tmout </mail_notify_type><post_notify_type> crit warn unkn succ tmout </post_notify_type><mail_receviers>zhangguangzheng\@eyou.net</mail_receviers><attach_snap_mail>yes</attach_snap_mail><auto_handle_type>none </auto_handle_type><auto_handler>default_handler</auto_handler><debug>yes</debug></basic><userdef><user_defconf> test config value here</user_defconf></userdef></eminfo_plugin_config><eminfo_plugin_result><level>warn</level><type>str</type><body><title>summary </title><summary>title </summary><line size=\"10\" color=\"green\">green line</line><line size=\"8\" color=\"red\">red line</line><line size=\"9\">new line </line></body></eminfo_plugin_result><eminfo_autohandle_result><line size=\"38\">auto handle is disabled. Nothing to do</line></eminfo_autohandle_result><additional></additional></eminfo_postdata><!-- eminfo postdata end -->";
-my %dbconn=( dbhost=>'127.0.0.1', dbport=>'3306', database=>'eminfo', dbuser=>'eminfo', dbpass=>'eminfo' );
-&db_update('postlog',$xml,%dbconn);
+# my $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!-- eminfo postdata start --><eminfo_postdata><eminfo_id>752148030</eminfo_id><eminfo_gname>dev_bbklab.net</eminfo_gname><eminfo_jobid>sKR5Bmyr</eminfo_jobid><eminfo_jobts>1381128986</eminfo_jobts><eminfo_plugin_config><basic><name>test</name><enable>yes</enable><comment>Just a Test Plugin</comment><frequency>3min</frequency><exec_tmout>1min</exec_tmout><maxerr_times>1</maxerr_times><take_snapshot_type> crit warn unkn tmout </take_snapshot_type><mail_notify_type> crit warn unkn tmout </mail_notify_type><post_notify_type> crit warn unkn succ tmout </post_notify_type><mail_receviers>zhangguangzheng\@eyou.net</mail_receviers><attach_snap_mail>yes</attach_snap_mail><auto_handle_type>none </auto_handle_type><auto_handler>default_handler</auto_handler><debug>yes</debug></basic><userdef><user_defconf> test config value here</user_defconf></userdef></eminfo_plugin_config><eminfo_plugin_result><level>warn</level><type>str</type><body><title>summary </title><summary>title </summary><line size=\"10\" color=\"green\">green line</line><line size=\"8\" color=\"red\">red line</line><line size=\"9\">new line </line></body></eminfo_plugin_result><eminfo_autohandle_result><line size=\"38\">auto handle is disabled. Nothing to do</line></eminfo_autohandle_result><additional></additional></eminfo_postdata><!-- eminfo postdata end -->";
+# my %dbconn=( dbhost=>'127.0.0.1', dbport=>'3306', database=>'eminfo', dbuser=>'eminfo', dbpass=>'eminfo' );
+# &db_update('postlog',$xml,%dbconn);
 
 # Update message in db-backend
 # Usage: 	&db_update( {xml_text}  %{db_server_conf} )
