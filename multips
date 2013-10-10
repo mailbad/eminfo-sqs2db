@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+use POSIX;
+
+our$num=30;
+our$zombies=0;
+our$kid_proc_num=0;
+ 
+$SIG{CHLD}=sub{$zombies++};
+ 
+for(my$i=0;$i<$num;$i++){
+  my$pid=fork();
+  if(!defined($pid)){exit 1;}
+  unless($pid){
+	system"./sqs2db";
+	exit 0;
+  }
+  $kid_proc_num++;
+}
+
+POSIX::setsid() or die "Can't start a new session: $!\n";
+chdir '/';
+ 
+while(1){
+  if($zombies>0){
+	while((my$collect=waitpid(-1,WNOHANG))>0){
+		$kid_proc_num--;
+	}
+  	$zombies=0;
+  }
+  if($kid_proc_num==0){
+	last;
+  } else {
+	next;
+  }
+}  
