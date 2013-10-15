@@ -60,7 +60,6 @@ my %db_connect = (
 
 
 while (1) {
-	sleep (0.5);
 	my $heartbeat = sqs_get($get_heartbeat_request, %sqs_connect);
 	my $postlog = sqs_get($get_postlog_request, %sqs_connect);
 	if (!$heartbeat || !$postlog) {
@@ -75,16 +74,20 @@ while (1) {
 
 	if ($heartbeat eq 'HTTPSQS_GET_END') {
 		print "queue: heartbeat got to the end\n";
+		sleep (1);
 	} elsif ($heartbeat eq 'HTTPSQS_AUTH_FAILED') {
 		print "queue: heartbeat auth failed\n";
+		exit(1);
 	} else {
 		db_update('heartbeat', $heartbeat, %db_connect);
 	}
 
 	if ($postlog eq 'HTTPSQS_GET_END') {
 		print "queue: postlog got to the end\n";
+		sleep (1);
 	} elsif ($postlog eq 'HTTPSQS_AUTH_FAILED') {
 		print "queue: postlog auth failed\n";
+		exit(1);
 	} else {
 		db_update('postlog', $postlog, %db_connect);
 	}
