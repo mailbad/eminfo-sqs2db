@@ -3,7 +3,7 @@ use Getopt::Std;
 use DBI;
 
 # Current database version
-my $thisversion = "1.0.0";
+my $thisversion = "1.0.1";
 
 my $usage = "Usage: $0 -h hostname -P port -d database -u user -p password";
 
@@ -32,17 +32,28 @@ my $dbh = DBI->connect(
 # Create version table if it doesn't exist
 eval { $dbh->do("SELECT * FROM dbversion WHERE version='$thisversion' AND name='eminfo-sqs2db' LIMIT 1") };
 if ($@) {
+
 	my $file="eminfo.sql";
+	my $trigger="eminfo.trg";
+
 	if (-e $file){
 	    print "** Creating tables on version $thisversion\n";
 	    print "     Using $file for installation...\n";
 	    my $p = "-p$password" if $password;	# Not required if password is blank
 	    system("mysql -u $username $p -D$database -h$hostname -P$dataport < $file") == 0 or die "Installation from $file failed";
-	}
-	else{
+	}else{
 	    die "No installation sql-script found!";
 	}
 
+	if (-e $trigger){
+	    print "** Creating triggers on version $thisversion\n";
+	    print "     Using $trigger for creating...\n";
+	    my $t = "-p$password" if $password; # Not required if password is blank
+	    system("mysql -u $username $t -D$database -h$hostname -P$dataport < $trigger") == 0 or die "Creating from $trigger failed";
+	}else{
+	   die "No trigger sql-script found!";
+	}
+	
 	print "** Updating version table\n";
 	$dbh->do("INSERT dbversion SET name='eminfo-sqs2db', version='$thisversion';");
 

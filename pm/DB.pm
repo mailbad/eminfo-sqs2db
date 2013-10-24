@@ -64,13 +64,15 @@ sub db_update {
 	return undef;
   }
 
-  my ($eminfo_id, $plugin); 
+  my ($eminfo_id, $eminfo_name, $plugin); 
   if ($table eq 'postlog') {
 	my $xml = XMLin($text);
 	$eminfo_id = $xml->{'eminfo_id'};
+	$eminfo_name = $xml->{'eminfo_gname'};
 	$plugin = $xml->{'eminfo_plugin_config'}->{'basic'}->{'name'};
 	### $xml
 	### $eminfo_id
+	### $eminfo_name
 	### $plugin
   } elsif ($table eq 'heartbeat') {
 	$text =~ m/eminfo_id\s*=\s*(\w+)\s+/i;
@@ -92,13 +94,13 @@ sub db_update {
 
   if ($num >= 1) {  # update
 	if ($table eq 'postlog') {
-		$sql=$connect->prepare("update $table set content='$text', time=UNIX_TIMESTAMP() where id='$eminfo_id' and plugin='$plugin';");
+		$sql=$connect->prepare("update $table set content='$text', name='$eminfo_name', time=UNIX_TIMESTAMP() where id='$eminfo_id' and plugin='$plugin';");
 	} elsif ($table eq 'heartbeat') {
 		$sql=$connect->prepare("update $table set content='$text', time=UNIX_TIMESTAMP() where id='$eminfo_id';");
 	}
   } else {	    # insert
 	if ($table eq 'postlog') {
-		$sql=$connect->prepare("insert $table (id,time,plugin,content) values ('$eminfo_id',UNIX_TIMESTAMP(),'$plugin','$text');");
+		$sql=$connect->prepare("insert $table (id,name,time,plugin,content) values ('$eminfo_id','$eminfo_name',UNIX_TIMESTAMP(),'$plugin','$text');");
 	} elsif ($table eq 'heartbeat') {
 		$sql=$connect->prepare("insert $table (id,time,content) values ('$eminfo_id',UNIX_TIMESTAMP(),'$text');");
 	}

@@ -87,23 +87,20 @@ while (1) {
 	### $heartbeat
 	### $postlog
 
-	if ($heartbeat eq 'HTTPSQS_GET_END') {
-		print "queue: heartbeat got to the end\n" if $verbose;
+	if ($heartbeat eq 'HTTPSQS_GET_END' && $postlog eq 'HTTPSQS_GET_END' ) {
+		print "queue: heartbeat and postlog got to the end\n" if $verbose;
 		sleep (1);
-	} elsif ($heartbeat eq 'HTTPSQS_AUTH_FAILED') {
-		print "queue: heartbeat auth failed\n";
+	} elsif ($heartbeat eq 'HTTPSQS_AUTH_FAILED' || $postlog eq 'HTTPSQS_AUTH_FAILED') {
+		print "auth failed\n";
 		exit(1);
 	} else {
-		db_update('heartbeat', $heartbeat, %db_connect);
-	}
-
-	if ($postlog eq 'HTTPSQS_GET_END') {
-		print "queue: postlog got to the end\n" if $verbose;
-		sleep (1);
-	} elsif ($postlog eq 'HTTPSQS_AUTH_FAILED') {
-		print "queue: postlog auth failed\n";
-		exit(1);
-	} else {
-		db_update('postlog', $postlog, %db_connect);
+		if ($heartbeat ne 'HTTPSQS_GET_END') {
+			print "db update heartbeat\n" if $verbose;
+			db_update('heartbeat', $heartbeat, %db_connect);
+		}
+		if ($postlog ne 'HTTPSQS_GET_END') {
+			print "db update postlog\n" if $verbose;
+			db_update('postlog', $postlog, %db_connect);
+		}
 	}
 }
