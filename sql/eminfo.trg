@@ -18,8 +18,8 @@ DROP TRIGGER IF EXISTS trigger_archive_postlog //
 CREATE TRIGGER trigger_archive_postlog AFTER UPDATE
 ON postlog FOR EACH ROW
 BEGIN
-	INSERT INTO postlog_archive (id,name,time,plugin,content)
-	VALUES (OLD.id,OLD.name,OLD.time,OLD.plugin,OLD.content);
+	INSERT INTO postlog_archive (id,name,time,plugin,level,summary,content)
+	VALUES (OLD.id,OLD.name,OLD.time,OLD.plugin,OLD.level,OLD.summary,OLD.content);
 END;
 
 -- {{{ trigger_archive_heartbeat

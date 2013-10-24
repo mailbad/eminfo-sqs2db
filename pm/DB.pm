@@ -12,10 +12,6 @@ $DB::VERSION = '1.0.0';
 
 $| = 1;
 
-# my $xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><!-- eminfo postdata start --><eminfo_postdata><eminfo_id>1695688212</eminfo_id><eminfo_gname>rhel5.1_eminfo.dev.lab</eminfo_gname><eminfo_jobid>hqLZ9449</eminfo_jobid><eminfo_jobts>1381423777</eminfo_jobts><eminfo_plugin_config><basic><name>memory</name><enable>yes</enable><comment>Memory Usage Check</comment><frequency>3min</frequency><exec_tmout>1min</exec_tmout><maxerr_times>3</maxerr_times><take_snapshot_type> crit warn unkn tmout </take_snapshot_type><mail_notify_type> crit warn unkn tmout </mail_notify_type><post_notify_type> crit warn unkn succ tmout </post_notify_type><mail_receviers>zhangguangzheng\@eyou.net root_bbk\@126.com</mail_receviers><attach_snap_mail>yes</attach_snap_mail><auto_handle_type>none </auto_handle_type><auto_handler>default_handler</auto_handler><debug>yes</debug></basic><userdef><mem_uplimit> 90</mem_uplimit><swp_uplimit> 10</swp_uplimit></userdef></eminfo_plugin_config><eminfo_plugin_result><level>ok</level><type>str</type><body><title>Memory/Swap Usage Check OK </title><summary>2/2 ok </summary><line size=\"45\">Memory Usage: [24.200]% &lt;= Uplimit: [90%] </line><line size=\"25\">total=[392]M free=[297]M </line><line size=\"38\">Swap Usage: [0]% &lt;= Uplimit: [10%] </line><line size=\"27\">total=[1027]M free=[1027]M </line></body></eminfo_plugin_result><eminfo_autohandle_result><line size=\"38\">auto handle is disabled. Nothing to do</line></eminfo_autohandle_result><additional></additional></eminfo_postdata><!-- eminfo postdata end -->";
-# my %dbconn=( dbhost=>'127.0.0.1', dbport=>'3306', database=>'eminfo', dbuser=>'eminfo', dbpass=>'eminfo' );
-# &db_update('postlog',$xml,%dbconn);
-
 # Update message in db-backend
 # Usage: 	&db_update( {xml_text}  %{db_server_conf} )
 # Example:	my %dbconn=( dbhost=>'127.0.0.1', dbport=>'3306', database=>'eminfo', dbuser=>'eminfo', dbpass=>'eminfo' );
@@ -64,16 +60,20 @@ sub db_update {
 	return undef;
   }
 
-  my ($eminfo_id, $eminfo_name, $plugin); 
+  my ($eminfo_id, $eminfo_name, $plugin, $level, $summary); 
   if ($table eq 'postlog') {
 	my $xml = XMLin($text);
 	$eminfo_id = $xml->{'eminfo_id'};
 	$eminfo_name = $xml->{'eminfo_gname'};
 	$plugin = $xml->{'eminfo_plugin_config'}->{'basic'}->{'name'};
+	$level = $xml->{'eminfo_plugin_result'}->{'level'};
+	$summary = $xml->{'eminfo_plugin_result'}->{'body'}->{'summary'};
 	### $xml
 	### $eminfo_id
 	### $eminfo_name
 	### $plugin
+	### $level
+	### $summary
   } elsif ($table eq 'heartbeat') {
 	$text =~ m/eminfo_id\s*=\s*(\w+)\s+/i;
 	$eminfo_id = $1;
@@ -94,13 +94,13 @@ sub db_update {
 
   if ($num >= 1) {  # update
 	if ($table eq 'postlog') {
-		$sql=$connect->prepare("update $table set content='$text', name='$eminfo_name', time=UNIX_TIMESTAMP() where id='$eminfo_id' and plugin='$plugin';");
+		$sql=$connect->prepare("update $table set content='$text', name='$eminfo_name', level='$level', summary='$summary', time=UNIX_TIMESTAMP() where id='$eminfo_id' and plugin='$plugin';");
 	} elsif ($table eq 'heartbeat') {
 		$sql=$connect->prepare("update $table set content='$text', time=UNIX_TIMESTAMP() where id='$eminfo_id';");
 	}
   } else {	    # insert
 	if ($table eq 'postlog') {
-		$sql=$connect->prepare("insert $table (id,name,time,plugin,content) values ('$eminfo_id','$eminfo_name',UNIX_TIMESTAMP(),'$plugin','$text');");
+		$sql=$connect->prepare("insert $table (id,name,time,plugin,level,summary,content) values ('$eminfo_id','$eminfo_name',UNIX_TIMESTAMP(),'$plugin','$level','$summary','$text');");
 	} elsif ($table eq 'heartbeat') {
 		$sql=$connect->prepare("insert $table (id,time,content) values ('$eminfo_id',UNIX_TIMESTAMP(),'$text');");
 	}

@@ -4,7 +4,7 @@
 
 SET NAMES utf8;
 -- USE eminfo;
--- GRANT SELECT,INSERT,UPDATE ON eminfo.* to eminfo@127.0.0.1 IDENTIFIED BY 'eminfo';
+-- GRANT ALL PRIVILEGES ON eminfo.* to eminfo@127.0.0.1 IDENTIFIED BY 'eminfo';
 -- FLUSH PRIVILEGES;
 
 
@@ -56,9 +56,13 @@ CREATE TABLE IF NOT EXISTS `postlog` (
   `name` varchar(64) NOT NULL,		-- eminfo name
   `time` int(11) NOT NULL,		-- update time
   `plugin` varchar(64) NOT NULL,  	-- plugin name
+  `level` varchar(16) NOT NULL,		-- result level
+  `summary` varchar(256) NOT NULL,	-- result summary
   `content` text NOT NULL,		-- xml output
   PRIMARY KEY (`id`,`plugin`),		-- primary key
-  KEY `ik_0` (`id`)			-- index
+  KEY `ik_0` (`id`),			-- index
+  KEY `ik_1` (`plugin`),		-- index
+  KEY `ik_2` (`level`)			-- index
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --
@@ -72,10 +76,15 @@ CREATE TABLE IF NOT EXISTS `postlog_archive` (
   `name` varchar(64) NOT NULL,          -- eminfo name
   `time` int(11) NOT NULL,              -- update time
   `plugin` varchar(64) NOT NULL,        -- plugin name
+  `level` varchar(16) NOT NULL,         -- result level
+  `summary` varchar(256) NOT NULL,      -- result summary
   `content` text NOT NULL,              -- xml output
   PRIMARY KEY (`logid`),          	-- primary key
   KEY `ik_0` (`id`,`plugin`),		-- index
-  KEY `ik_1` (`id`)                     -- index
+  KEY `ik_1` (`id`),                    -- index
+  KEY `ik_2` (`plugin`),		-- index
+  KEY `ik_3` (`level`),			-- index
+  KEY `ik_4` (`plugin`,`level`)		-- index
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --

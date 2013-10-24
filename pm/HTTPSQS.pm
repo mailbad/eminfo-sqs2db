@@ -11,15 +11,11 @@ $HTTPSQS::VERSION = '1.0.0';
 
 $| = 1;
 
-#my %config = ( host=>'127.0.0.1', port=>'1218' );
-#my $result = &sqs_get("/?charset=utf-8&name=eminfo_postdata&auth=123qaz&opt=get", %config);
-#print "$result\n";
-
 # Get message from httpsqs
 # Usage: 	&sqs_get( {request_string}  %{sqs_server_conf} )
 # Example:	my %config=( host=>'127.0.0.1', port=>'1218' );
 #		&sqs_get("/?charset=utf-8&name=eminfo_postdata&auth=123qaz&opt=get", %config);
-
+#
 sub sqs_get {
   my $query = shift;
   my %sqs_conf = @_;
