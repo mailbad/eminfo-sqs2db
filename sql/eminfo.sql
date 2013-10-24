@@ -99,7 +99,9 @@ CREATE TABLE IF NOT EXISTS `plugins` (
   `id` varchar(10) NOT NULL,            -- eminfo id   (trigger from: postlog.id)
   `plugin` varchar(64) NOT NULL,	-- plugin name (trigger from: postlog.plugin)
   `alias`  varchar(64) NOT NULL,	-- plugin alias (set by administrator)
-  PRIMARY KEY (`id`)			-- primary key
+  PRIMARY KEY (`id`,`plugin`),		-- primary key
+  KEY `ik_0` (`id`),                    -- index
+  KEY `ik_1` (`plugin`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
 --

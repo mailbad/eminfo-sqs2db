@@ -5,7 +5,11 @@ DROP TRIGGER IF EXISTS trigger_newer_postlog //
 CREATE TRIGGER trigger_newer_postlog AFTER INSERT
 ON postlog FOR EACH ROW
 BEGIN
-	INSERT INTO hosts (id,name) VALUES (NEW.id,New.name);	
+DECLARE $hostnum INT(10);
+	SELECT COUNT(id) INTO $hostnum FROM hosts WHERE id=NEW.id;
+	IF $hostnum <= 0 THEN
+		INSERT INTO hosts (id,name) VALUES (NEW.id,New.name);	
+	END IF;
 	INSERT INTO plugins (id,plugin) VALUES (NEW.id,NEW.plugin);
 END;
 
