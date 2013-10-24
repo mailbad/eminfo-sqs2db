@@ -1,0 +1,33 @@
+#
+#
+# write following content into system start up files.
+#
+# start httpsqs and stunnel
+#
+
+
+# 1. start httpsqs
+ulimit -SHn 65535;
+wait;
+/usr/bin/httpsqs -d -p 1217 -a 123qaz -x /data/httpsqs_queue_data/ -l 127.0.0.1;
+wait;
+
+# 2. generate stunnel.conf
+# run once only
+# openssl req -new -x509 -days 365 -nodes -out /etc/stunnel/stunnel.pem -keyout /etc/stunnel/stunnel.pem
+cat << EOF > /etc/stunnel/stunnel.conf
+key =  /etc/stunnel/stunnel.pem
+cert = /etc/stunnel/stunnel.pem
+pid = /var/run/stunnel.pid
+setuid = root
+setgid = root
+debug = 1
+output = /var/log/stunnel.log
+
+[httpsqss]
+accept = 1218
+connect = 127.0.0.1:1217
+EOF
+
+# 3. start stunnel
+/usr/bin/stunnel
